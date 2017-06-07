@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+  <% include partials/_header.ejs %>
+  <h1>urls index</h1>
+
+
+  <ul>
+
+    <% for (var key in urls) { %>
+      <li><%= key + ':' + urls[key] %>
+        <form method="POST" action="/urls/<%= key %>/delete">
+      </li>
+
+      <button>Delete</button>
+      </form>
+    <% } %>
+  </ul>
+
+
+    <a href = "www.jsjsjsjsjsjs.com">Link to nowhere</a>
+</body>
+</html>
