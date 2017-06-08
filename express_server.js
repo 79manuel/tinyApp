@@ -38,8 +38,21 @@ res.json(urlDatabase);
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  "9sm5xK": "http://www.google.com"
 };
+
+const users = {
+  "userID": {
+    id: "aaa",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2ID": {
+    id: "bbb",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
 
 
 function generateRandomString() {
@@ -69,7 +82,6 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = {shortURL: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render("urls_show", templateVars);
 });
-
 
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
@@ -105,6 +117,17 @@ app.post('/login', function (req, res) {
   res.render("urls_index", templateVars.username);
 })
 
+//returns a page that includes a form with an email and password field.
+  app.get('/register', (req, res) => {
+    res.render('urls_register');
+  });
+
+  // generate a random user ID
+  app.post('/register', (req, res) => {
+    let Id = generateRandomString();
+    users[Id] = req.body.id;
+    res.redirect("/register");
+  });
 
 
 
