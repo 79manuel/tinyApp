@@ -89,15 +89,14 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/urls/:id/update", (req, res) => {
-  const something = urlDatabase[req.params.id];
-  something.longURL = req.body.longURL;
+  urlDatabase[req.params.id] = req.body.longURL;
   res.redirect("/urls");
 });
 
 // sets the cookie with the value(username) introduced by user
 app.post('/login', function (req, res) {
   res.cookie('username', req.body.username);// requires the username value from
-                                            //request's body
+                                            // request's body.
   res.redirect('/urls') // All POST req follow the pattern Redirect/Get
 
   let templateVars = {

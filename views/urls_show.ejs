@@ -8,7 +8,7 @@
   <h1>urls show</h1>
   <h2><%= shortURL + " : " + longURL %></h2>
     <!--<a href = "www.jsjsjsjsjsjs.com">Link to nowhere</a>-->
-    <form action="/urls" method="post">
+    <form action="/urls/<%= shortURL %>/update" method="post">
       <label for="URL">Update URL:</label>
       <input id="URL" type="text" name="longURL" placeholder="http://" style="width: 300px" />
       <button>Update</button>
