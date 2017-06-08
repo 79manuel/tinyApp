@@ -4,10 +4,12 @@
 var express = require("express");
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
+var cookieParser = require('cookie-parser');
 
 // Configuration
 //==============
 app.set("view engine", "ejs")
+app.use(cookieParser());
 
 // Middlewares
 //============
@@ -23,13 +25,16 @@ app.use(bodyParser.urlencoded({extended: true}));
 // app.get("/hello", (req, res) => {
 //   res.end("<html><body>Hello <b>World</b></body></html>\n");
 // });
-// app.get("/urls.json", (req, res) => {
-// res.json(urlDatabase);
-// });
+app.get("/urls.json", (req, res) => {
+res.json(urlDatabase);
+});
 
 
 // Routes
 // ======
+app.get("/urls.json", (req, res) => {
+res.json(urlDatabase);
+});
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -82,6 +87,25 @@ app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
 });
+
+app.post("/urls/:id/update", (req, res) => {
+  const something = urlDatabase[req.params.id];
+  something.longURL = req.body.longURL;
+  res.redirect("/urls");
+});
+
+// sets the cookie with the value(username) introduced by user
+app.post('/login', function (req, res) {
+  res.cookie('username', req.body.username);// requires the username value from
+                                            //request's body
+  res.redirect('/urls') // All POST req follow the pattern Redirect/Get
+
+  let templateVars = {
+  username: req.cookies["username"],
+  };
+  res.render("urls_index", templateVars.username);
+})
+
 
 
 
