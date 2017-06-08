@@ -5,22 +5,16 @@ var express = require("express");
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
 var cookieParser = require('cookie-parser');
+const bodyParser = require("body-parser");
+//const userService = require('./services/user-service');
 
-// Configuration
-//==============
-app.set("view engine", "ejs")
-app.use(cookieParser());
 
 // Middlewares
 //============
 
-const bodyParser = require("body-parser");
+app.set("view engine", "ejs")
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
-
-
-
-
-//console.log(generateRandomString());
 
 // app.get("/hello", (req, res) => {
 //   res.end("<html><body>Hello <b>World</b></body></html>\n");
@@ -43,12 +37,12 @@ var urlDatabase = {
 
 const users = {
   "userID": {
-    id: "aaa",
+    id: "userID",
     email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
  "user2ID": {
-    id: "bbb",
+    id: "user2ID",
     email: "user2@example.com",
     password: "dishwasher-funk"
   }
@@ -68,8 +62,18 @@ function generateRandomString() {
 
 //it gets the request from client and renders page requested
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
+//     let users = {
+//   user: req.cookies["user"],
+//   };
+//   res.render("urls_index", users.user);
+// })
+  let users = {
+
+    urls: urlDatabase,
+    userId: req.cookies["user_id"]
+  };
+
+  res.render("urls_index", users);
 });
 
 //it gets the request for page "new" and renders page "new"
@@ -79,8 +83,8 @@ app.get("/urls/new", (req, res) => {
 
 //it gets the request for any ID and renders page for that ID
 app.get("/urls/:id", (req, res) => {
-  let templateVars = {shortURL: req.params.id, longURL: urlDatabase[req.params.id]};
-  res.render("urls_show", templateVars);
+  let users = {shortURL: req.params.id, longURL: urlDatabase[req.params.id]};
+  res.render("urls_show", users);
 });
 
 app.post("/urls", (req, res) => {
@@ -105,28 +109,78 @@ app.post("/urls/:id/update", (req, res) => {
   res.redirect("/urls");
 });
 
-// sets the cookie with the value(username) introduced by user
-app.post('/login', function (req, res) {
-  res.cookie('username', req.body.username);// requires the username value from
-                                            // request's body.
-  res.redirect('/urls') // All POST req follow the pattern Redirect/Get
+app.post('/logout', (req, res) => {
+  res.clearCookie("user_id");
+  res.redirect('/urls');
+});
 
-  let templateVars = {
-  username: req.cookies["username"],
-  };
-  res.render("urls_index", templateVars.username);
-})
+const userExists = email => {
+  for (let user in users) {
+    if(users[user].email === email) {
+      return user;
+    }
+  }
+}
+
+// sets the cookie with the value(user) introduced by user
+app.post('/login', function (req, res) {
+  console.log("Looking at req.body.email", req.body.email)
+  for (let user in users) {
+    let userID = userExists(req.body.email);
+    console.log('userID', userID);
+      if (!userID) {
+        res.status(403).send('Email not found');
+      }
+      if (users[userID].password !== req.body.password) {
+        res.status(403).send('Password not found');
+      }
+
+      res.cookie('user_id', userID);
+      res.redirect('/urls');
+    }
+  });
+
+  // res.cookie('user', req.body.user);// requires the user value from
+  //                                           // request's body.
+  // res.redirect('/urls') // All POST req follow the pattern Redirect/Get
+
+
 
 //returns a page that includes a form with an email and password field.
   app.get('/register', (req, res) => {
-    res.render('urls_register');
+    res.render('urls_register', {});
   });
 
-  // generate a random user ID
+  // generate a random user ID and sets the cookie
   app.post('/register', (req, res) => {
+    if (req.body.email === '' || req.body.password === '') {
+      res.status(400).send('You must provide a password or email address');
+      return;
+    }
+
+    for (let user in users) {
+      if (users[user].email === req.body.email) {
+        res.status(400).send('Email already exists');
+        return;
+      }
+    }
+
+    //It generates random ID
     let Id = generateRandomString();
-    users[Id] = req.body.id;
-    res.redirect("/register");
+    //The new ID generated is put into the users DB and has the values taken from the post reques
+    users[Id] = {
+      id: Id,
+      email: req.body.email,
+      password: req.body.password
+    }
+    console.log(users);
+    //It sets the cookie with the user ID generated above.
+    res.cookie('user_id', Id);
+    res.redirect("/urls");
+  });
+
+  app.get('/login', (req, res) => {
+    res.render('urls_login');
   });
 
 

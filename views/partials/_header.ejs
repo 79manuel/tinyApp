@@ -4,13 +4,25 @@
   <title>partial header</title>
 </head>
 <body>
-
+<% if (userId) { %>
+  <%= userId %>
+    <form action="/logout" method="post">
+      <button>Logout</button>
+    </form>
+<% } else { %>
     <form action="/login" method="post">
       <label style="margin-left:10px;" for="username">User Name  </label>
       <input id="username" type="text" name="username" placeholder="Enter your user name" style="width: 300px; margin-top:10px; margin-left:10px;" />
       <button>Submit</button>
 
     </form>
+    <ul>
+    <li><a href="http://localhost:8080/register">Register</a></li>
+    <li><a href="http://localhost:8080/login">Login</a></li>
+    </ul>
+<% } %>
+
+
 
 </body>
 </html>
