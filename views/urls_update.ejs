@@ -4,8 +4,7 @@
   <title>TinyApp</title>
 </head>
 <body>
-  <% include partials/_header.ejs %>
-  <h1>urls show</h1>
+  <h1>urls update</h1>
   <h2><%= shortURL + " : " + longURL %></h2>
     <!--<a href = "www.jsjsjsjsjsjs.com">Link to nowhere</a>-->
     <form action="/urls/<%= shortURL %>/update" method="post">

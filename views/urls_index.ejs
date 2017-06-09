@@ -11,18 +11,21 @@
 
   <ul>
 
-    <% for (var key in urls) { %>
-      <li><%= key + ':' + urls[key] %>
-        <form method="POST" action="/urls/<%= key %>/delete">
-      </li>
-      <button>Delete</button>
-      </form>
-      <button href = "http://localhost:8080/urls/update">Update</button>
 
+    <% if (!user) { %>
+      <p style="font-weight:bold; text-align:center; font-size: 30px; ">Login to see your urls!!!!</p>
+
+    <% } else { %>
+      <% for (var key in urls) { %>
+      <form method="POST" action="/urls/<%= key %>/delete">
+        <li style="margin-bottom:5px; margin-top:10px;"><%= key + ': ' + urls[key] %></li>
+        <button>Delete</button>
+      </form>
+      <a href="http://localhost:8080/urls/<%= key %>">Update</a>
+      <a href="http://localhost:8080/urls/new">New</a>
+      <% } %>
     <% } %>
   </ul>
 
-
-    <a href = "www.jsjsjsjsjsjs.com">Link to nowhere</a>
 </body>
 </html>

@@ -31,8 +31,14 @@ res.json(urlDatabase);
 });
 
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "I": {
+    "b2xVn2": "http://www.lighthouselabs.ca",
+  },
+
+  "user2ID": {
+    "9sm5xK": "http://www.google.com",
+  }
+
 };
 
 const users = {
@@ -41,7 +47,7 @@ const users = {
     email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
- "user2ID": {
+  "user2ID": {
     id: "user2ID",
     email: "user2@example.com",
     password: "dishwasher-funk"
@@ -59,44 +65,66 @@ function generateRandomString() {
   return text;
 }
 
-
+function urlsForUser(Id) {
+  let UserUrls = urlDatabase[Id];
+    return UserUrls;
+}
 //it gets the request from client and renders page requested
 app.get("/urls", (req, res) => {
-//     let users = {
-//   user: req.cookies["user"],
-//   };
-//   res.render("urls_index", users.user);
-// })
-  let users = {
-
-    urls: urlDatabase,
-    userId: req.cookies["user_id"]
+  let templateVars = {
+    urls: urlsForUser(req.cookies["user_id"]),
+    userId: req.cookies["user_id"],
+    user: users[req.cookies.user_id]
   };
 
-  res.render("urls_index", users);
+  res.render("urls_index", templateVars);
 });
 
 //it gets the request for page "new" and renders page "new"
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies.user_id){
+    res.redirect('/urls/login')
+  }
   res.render("urls_new");
 });
 
 //it gets the request for any ID and renders page for that ID
 app.get("/urls/:id", (req, res) => {
   let users = {shortURL: req.params.id, longURL: urlDatabase[req.params.id]};
-  res.render("urls_show", users);
+  res.render("urls_update", users);
 });
 
+
+
+
 app.post("/urls", (req, res) => {
-  let shortURL = generateRandomString();
-  urlDatabase[shortURL] = 'http://' + req.body.longURL
+  const shortURL = generateRandomString();
+  const longURL = 'http://' + req.body.longURL;
+
+  //You have to check if the user is logged in
+  const user = userExistsId(req.cookies.user_id);
+  //console.log(user);
+  if (!user) {
+    res.redirect("/");
+    return;
+  }
+  urlDatabase[user.id][shortURL] = longURL;
+  //You have to add the new shortUrl as key and longUrl as value to the object
+
   res.redirect("/urls");
 });
 
+function getLongURLfromShortURL(shortURL) {
+  for (const userID in urlDatabase) {
+    const userUrls = urlDatabase[userID];
+    if (userUrls[shortURL]) {
+      return userUrls[shortURL];
+    }
+  }
+}
 //it gets the request for page "shortURL" and renders page "shor URL"
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  res.redirect(getLongURLfromShortURL(req.params.shortURL));
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -104,8 +132,21 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+
 app.post("/urls/:id/update", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
+  const userID = req.cookies.user_id;
+  const shortURL = req.body.shortURL;
+  const longURL = req.body.longURL;
+  if (!userID){
+    res.status(403).send('You must be logged in');
+  }
+  const userUrls = urlDatabase[userID];
+
+  if (!userUrls || userUrls.hasOwnProperty(shortURL) === false) {
+    res.status(403).send("You don't own the URL");
+  }
+
+  userUrls[shortURL] = longURL;
   res.redirect("/urls");
 });
 
@@ -121,10 +162,15 @@ const userExists = email => {
     }
   }
 }
-
+const userExistsId = id => {
+  for (let user in users) {
+    if(users[user].id === id) {
+      return users[user];
+    }
+  }
+}
 // sets the cookie with the value(user) introduced by user
 app.post('/login', function (req, res) {
-  console.log("Looking at req.body.email", req.body.email)
   for (let user in users) {
     let userID = userExists(req.body.email);
     console.log('userID', userID);
@@ -173,6 +219,7 @@ app.post('/login', function (req, res) {
       email: req.body.email,
       password: req.body.password
     }
+    urlDatabase[Id] = {};
     console.log(users);
     //It sets the cookie with the user ID generated above.
     res.cookie('user_id', Id);
