@@ -17,15 +17,15 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
-  keys: ['manuel'],
+    secret: 'manuel',
   maxAge: 24 * 60 * 60 * 1000
 }));
 app.use(methodOverride('_method'));
 
-//What it is this for????
-app.get("/urls.json", (req, res) => {
-res.json(urlDatabase);
-});
+// //What it is this for????
+// app.get("/urls.json", (req, res) => {
+// res.json(urlDatabase);
+// });
 
 
 // Routes
@@ -111,12 +111,12 @@ app.post("/urls", (req, res) => {
 
   const longURL = 'http://' + req.body.longURL;
 
-  //You have to check if the user is logged in
+
   const user = userExistsId(req.session.user_id);
- //console.log(user);
+
   if (!user) {
     res.redirect("/");
-    //return;
+
   }
   else{
     if(urlDatabase[user.id]){
@@ -146,7 +146,7 @@ function getLongURLfromShortURL(shortURL) {
     }
   }
 }
-//it gets the request for page "shortURL" and renders page "shor URL"
+///u/:id redirects to longURL
 app.get("/u/:shortURL", (req, res) => {
   res.redirect(getLongURLfromShortURL(req.params.shortURL));
 });
@@ -184,7 +184,7 @@ app.post("/urls/:id/update", (req, res) => {
 
   else {
   userUrls[shortURL] = longURL;
-  res.redirect("/urls/new");
+  res.redirect("/urls");
   }
 });
 
