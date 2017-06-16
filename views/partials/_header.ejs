@@ -1,5 +1,5 @@
 <% if (user) { %>
-    <%= 'Welcome to TinyApp ' + userId %>
+    <%= 'Welcome to TinyApp ' + user.email %>
     <ul style="list-style-type:none;" >
         <li>
             <form action="/logout" method="post"><br>
@@ -7,16 +7,15 @@
             </form>
         </li>
         <li>
-            <a href="http://localhost:8080/urls/new"><button>New URL</button></a>
+            <a href="/urls/new"><button>New URL</button></a>
         </li>
     </ul>
 
-    <%} else {%>
+<%} else {%>
 
-    <a href="http://localhost:8080/register"><button>Register</button></a>
-    <a href="http://localhost:8080/login"><button>Login</button></a>
+    <a href="/register"><button>Register</button></a>
+    <a href="/login"><button>Login</button></a>
 
-
-    <%}%>
+<%}%>
 
 

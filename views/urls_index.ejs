@@ -6,18 +6,20 @@
 <body>
   <h1 style="text-align:center; color:blue;
   font-size:55px;">TinyApp</h1>
-  <p style="margin-left:40px; font-size:30px; font-weight: 20px;"><% include partials/_header.ejs %></p>
+  <p style="margin-left:40px; font-size:30px; font-weight: 20px;">
+  <% include partials/_header.ejs %></p>
   <ul>
     <% if (!user) { %>
       <p style="font-weight:bold; text-align:center; font-size: 30px; ">Login to see your urls!!!!</p>
 
     <% } else { %>
-      <% for (var key in urls) { %>
-      <form method="POST" action="/urls/<%= key %>/delete">
-        <li style="margin-bottom:5px; margin-top:10px;"><%= key + ': ' + urls[key] %></li>
+      <% for (var shortURL in urls) { %>
+      <form method="POST" action="/urls/<%= shortURL %>/delete">
+        <li style="margin-bottom:5px; margin-top:10px;"><%= shortURL + ': ' + urls[shortURL] %></li>
         <button>Delete</button>
       </form>
-      <a href="http://localhost:8080/urls/<%= key %>/update"><button>Update</button></a>
+
+      <a href="/urls/<%=shortURL%>"><button>Update</button></a>
       <% } %>
     <% } %>
   </ul>
