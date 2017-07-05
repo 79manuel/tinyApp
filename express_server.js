@@ -132,13 +132,13 @@ function getLongURLfromShortURL(shortURL) {
 }
 
 app.get("/u/:shortURL", (req, res) => {
-  if (getLongURLfromShortURL(req.params.shortURL) in urlDatabase) {
-    let longURL = getLongURLfromShortURL(req.params.shortURL).longURL;
+  let longURL = getLongURLfromShortURL(req.params.shortURL);
+  if (longURL !== undefined) {
     //let URL = "http://" + longURL;
     res.redirect(longURL);
-    return ;
+    return;
   } else {
-    res.status(400).send(`You shoud put right shortURL<br>Go to
+    res.status(400).send(`wrong shortURL<br>Go to
     <a href="/urls">login</a> in page<br>or go to <a href="/register">
     Register</a> page`);
   }
@@ -154,7 +154,7 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id/update", (req, res) => {
   const userID = req.session.user_id;
   const shortURL = req.params.id;
-  const longURL = req.body.longURL;
+  const longURL = 'http://' + req.body.longURL;
   if (!userID){
     res.status(403).send('You must be logged in<br><a href="/login"><button>Login to tinyApp</button></a>');
     return;
@@ -184,6 +184,7 @@ function userExists(email){
     }
   }
 }
+
 function userExistsId(id){
   for (let user in users) {
     if(users[user].id === id) {
